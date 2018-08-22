@@ -31,7 +31,7 @@ end nibble_data;
 architecture Behavioral of nibble_data is
     constant ip_header_bytes   : integer := 20;
     constant udp_header_bytes  : integer := 8;
-    constant data_bytes        : integer := 16+1024;
+    constant data_bytes        : integer := 1024;
     constant ip_total_bytes    : integer := ip_header_bytes + udp_header_bytes + data_bytes;
     constant udp_total_bytes   : integer := udp_header_bytes + data_bytes;
 
@@ -221,14 +221,14 @@ generate_nibbles: process (clk)
               -- Ethernet Frame Check Sequence (CRC) will 
               -- be added here, overwriting these nibbles
               --------------------------------------------
-              when x"875" => data_valid <= '0'; user_data <= '0';
-              when x"876" => NULL;
-              when x"877" => NULL;
-              when x"878" => NULL;
-              when x"879" => NULL;
-              when x"87A" => NULL;
-              when x"87B" => NULL;
-              when x"87C" => NULL;
+              when x"855" => data_valid <= '0'; user_data <= '0';
+              when x"856" => NULL;
+              when x"857" => NULL;
+              when x"858" => NULL;
+              when x"859" => NULL;
+              when x"85A" => NULL;
+              when x"85B" => NULL;
+              when x"85C" => NULL;
               ----------------------------------------------------------------------------------
               -- End of frame - there needs to be at least 20 octets (40 counts) before  sending 
               -- the next packet, (maybe more depending  on medium?) 12 are for the inter packet
@@ -237,7 +237,7 @@ generate_nibbles: process (clk)
               -- Note that when the count of 0000 adds one  more nibble, so if start is assigned 
               -- '1' this should be minimum that is  within spec.
               ----------------------------------------------------------------------------------
-              when x"8A3" => counter <= (others => '0'); busy  <= '0';
+              when x"883" => counter <= (others => '0'); busy  <= '0';
               when others => data <= "0000";
             end case;
          end if;    
