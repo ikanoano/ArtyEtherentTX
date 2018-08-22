@@ -37,7 +37,14 @@ entity ethernet_test is
            eth_col     : in  STD_LOGIC;
            eth_crs     : in  STD_LOGIC;
            -- reference clock
-           eth_ref_clk : out STD_LOGIC);
+           eth_ref_clk : out STD_LOGIC;
+           -- user data
+           nibble_clk       : out STD_LOGIC;
+           nibble           : out STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
+           nibble_user_data : out STD_LOGIC                     := '0';
+           nibble_valid     : out STD_LOGIC                     := '0';
+           with_usr         : in  STD_LOGIC_VECTOR (3 downto 0);
+           with_usr_valid   : in  STD_LOGIC);
 end ethernet_test;
 
 architecture Behavioral of ethernet_test is
@@ -65,9 +72,6 @@ architecture Behavioral of ethernet_test is
                data_valid : out STD_LOGIC);
     end component;
 
-    signal nibble           : STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
-    signal nibble_user_data : std_logic                     := '0';
-    signal nibble_valid     : std_logic                     := '0';
 
     component add_seq_num is
     Port ( clk             : in  STD_LOGIC;
@@ -78,10 +82,6 @@ architecture Behavioral of ethernet_test is
            user_data_out   : out STD_LOGIC;
            data_enable_out : out STD_LOGIC                     := '0');
     end component;
-
-    signal with_seq            : STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
-    signal with_seq_user_data  : std_logic                     := '0';
-    signal with_seq_valid      : std_logic                     := '0';
 
     component add_crc32 is
         Port ( clk             : in  STD_LOGIC;
@@ -169,20 +169,13 @@ data: nibble_data generic map (
       data       => nibble,
       user_data  => nibble_user_data,
       Data_valid => nibble_valid);
+nibble_clk <= eth_tx_clk;
 
-i_add_seq_num : add_seq_num port map(
-      clk             => eth_tx_clk,
-      data_in         => nibble,
-      user_data_in    => nibble_user_data,
-      data_enable_in  => nibble_valid,
-      data_out        => with_seq,
-      user_data_out   => with_seq_user_data,
-      data_enable_out => with_seq_valid);
 
 i_add_crc32: add_crc32 port map (
       clk             => eth_tx_clk,
-      data_in         => with_seq,
-      data_enable_in  => with_seq_valid,
+      data_in         => with_usr,
+      data_enable_in  => with_usr_valid,
       data_out        => with_crc,
       data_enable_out => with_crc_valid);
 
