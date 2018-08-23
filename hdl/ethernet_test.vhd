@@ -17,9 +17,6 @@ use UNISIM.vcomponents.all;
 
 entity ethernet_test is
     Port ( CLK100MHZ   : in    STD_LOGIC;
-           -- Switches
-           switches    : in  STD_LOGIC_VECTOR(3 downto 0);
-             
            -- control channel
            eth_mdio    : inout STD_LOGIC := '0';
            eth_mdc     : out   STD_LOGIC := '0';
@@ -38,6 +35,8 @@ entity ethernet_test is
            eth_crs     : in  STD_LOGIC;
            -- reference clock
            eth_ref_clk : out STD_LOGIC;
+           -- start timing
+           start_sending    : in  STD_LOGIC;
            -- user data
            nibble_clk       : out STD_LOGIC;
            nibble           : out STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
@@ -55,9 +54,6 @@ architecture Behavioral of ethernet_test is
     signal tx_ready      : std_logic                     := '0';
     signal ok_to_send    : std_logic                     := '0';
     signal user_data     : std_logic                     := '0';
-    signal start_sending : std_logic                     := '0';
-    signal count         : unsigned(24 downto 0)         := (others => '0');
-    signal max_count     : unsigned(24 downto 0)         := (others => '0');
     component nibble_data is
         generic (
             eth_src_mac       : std_logic_vector(47 downto 0);
@@ -118,40 +114,6 @@ begin
    ----------------------------------------------------
    -- No pullups/pulldowns added
 
-   ----------------------------------------------------
-   -- Scheduling when packets are sent
-   ----------------------------------------------------
- when_to_send: process(eth_tx_clk) 
-    begin  
-        if rising_edge(eth_tx_clk) then
-            case switches is
-                when "0000" => max_count <= to_unsigned(24_999_999,25);  -- 1 packet per second
-                when "0001" => max_count <= to_unsigned(12_499_999,25);  -- 2 packet per second
-                when "0010" => max_count <= to_unsigned( 2_499_999,25);  -- 10 packets per second 
-                when "0011" => max_count <= to_unsigned( 1_249_999,25);  -- 20 packet per second
-                when "0100" => max_count <= to_unsigned(   499_999,25);  -- 50 packets per second 
-                when "0101" => max_count <= to_unsigned(   249_999,25);  -- 100 packets per second
-                when "0110" => max_count <= to_unsigned(   124_999,25);  -- 200 packets per second 
-                when "0111" => max_count <= to_unsigned(    49_999,25);  -- 500 packets per second 
-                when "1000" => max_count <= to_unsigned(    24_999,25);  -- 1000 packets per second 
-                when "1001" => max_count <= to_unsigned(    12_499,25);  -- 2000 packets per second 
-                when "1010" => max_count <= to_unsigned(     4_999,25);  -- 5000 packets per second 
-                when "1011" => max_count <= to_unsigned(     2_499,25);  -- 10,000 packests per second 
-                when "1100" => max_count <= to_unsigned(       999,25);  -- 20,000 packets per second
-                when "1101" => max_count <= to_unsigned(       499,25);  -- 50,000 packets per second 
-                when "1110" => max_count <= to_unsigned(       249,25);  -- 100,000 packets per second
-                when others => max_count <= to_unsigned(         0,25);  -- as fast as possible 152,439 packets
-            end case;
-
-            if count = max_count then
-                count <= (others => '0');
-                start_sending <= '1';
-            else
-                count <= count + 1;
-                start_sending <= '0';
-            end if;
-        end if;
-    end process;
    ----------------------------------------------------
    -- Data for the packet packet 
    ----------------------------------------------------
