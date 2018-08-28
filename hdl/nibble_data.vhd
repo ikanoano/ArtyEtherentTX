@@ -31,11 +31,11 @@ end nibble_data;
 architecture Behavioral of nibble_data is
     constant ip_header_bytes   : integer := 20;
     constant udp_header_bytes  : integer := 8;
-    constant data_bytes        : integer := 1024;
+    constant data_bytes        : integer := 1024*4;
     constant ip_total_bytes    : integer := ip_header_bytes + udp_header_bytes + data_bytes;
     constant udp_total_bytes   : integer := udp_header_bytes + data_bytes;
 
-    signal counter : unsigned(11 downto 0) := (others => '0');
+    signal counter : unsigned(15 downto 0) := (others => '0');
     
     
     -- Ethernet frame header
@@ -97,138 +97,138 @@ generate_nibbles: process (clk)
             data <= "0000";
             case counter is 
               -- We pause at 0 count when idle (see below case statement)
-              when x"000" => NULL;
+              when x"0000" => NULL;
               -----------------------------
               -- MAC Header 
               -----------------------------
               -- Ethernet destination
-              when x"001" => data <= eth_dst_mac(43 downto 40); data_valid <= '1';
-              when x"002" => data <= eth_dst_mac(47 downto 44);
-              when x"003" => data <= eth_dst_mac(35 downto 32);
-              when x"004" => data <= eth_dst_mac(39 downto 36);
-              when x"005" => data <= eth_dst_mac(27 downto 24);
-              when x"006" => data <= eth_dst_mac(31 downto 28);
-              when x"007" => data <= eth_dst_mac(19 downto 16);
-              when x"008" => data <= eth_dst_mac(23 downto 20);
-              when x"009" => data <= eth_dst_mac(11 downto  8);
-              when x"00A" => data <= eth_dst_mac(15 downto 12);
-              when x"00B" => data <= eth_dst_mac( 3 downto  0);
-              when x"00C" => data <= eth_dst_mac( 7 downto  4);
+              when x"0001" => data <= eth_dst_mac(43 downto 40); data_valid <= '1';
+              when x"0002" => data <= eth_dst_mac(47 downto 44);
+              when x"0003" => data <= eth_dst_mac(35 downto 32);
+              when x"0004" => data <= eth_dst_mac(39 downto 36);
+              when x"0005" => data <= eth_dst_mac(27 downto 24);
+              when x"0006" => data <= eth_dst_mac(31 downto 28);
+              when x"0007" => data <= eth_dst_mac(19 downto 16);
+              when x"0008" => data <= eth_dst_mac(23 downto 20);
+              when x"0009" => data <= eth_dst_mac(11 downto  8);
+              when x"000A" => data <= eth_dst_mac(15 downto 12);
+              when x"000B" => data <= eth_dst_mac( 3 downto  0);
+              when x"000C" => data <= eth_dst_mac( 7 downto  4);
               -- Ethernet source
-              when x"00D" => data <= eth_src_mac(43 downto 40);
-              when x"00E" => data <= eth_src_mac(47 downto 44);
-              when x"00F" => data <= eth_src_mac(35 downto 32);
-              when x"010" => data <= eth_src_mac(39 downto 36);
-              when x"011" => data <= eth_src_mac(27 downto 24);
-              when x"012" => data <= eth_src_mac(31 downto 28);
-              when x"013" => data <= eth_src_mac(19 downto 16);
-              when x"014" => data <= eth_src_mac(23 downto 20);
-              when x"015" => data <= eth_src_mac(11 downto  8);
-              when x"016" => data <= eth_src_mac(15 downto 12);
-              when x"017" => data <= eth_src_mac( 3 downto  0);
-              when x"018" => data <= eth_src_mac( 7 downto  4);
+              when x"000D" => data <= eth_src_mac(43 downto 40);
+              when x"000E" => data <= eth_src_mac(47 downto 44);
+              when x"000F" => data <= eth_src_mac(35 downto 32);
+              when x"0010" => data <= eth_src_mac(39 downto 36);
+              when x"0011" => data <= eth_src_mac(27 downto 24);
+              when x"0012" => data <= eth_src_mac(31 downto 28);
+              when x"0013" => data <= eth_src_mac(19 downto 16);
+              when x"0014" => data <= eth_src_mac(23 downto 20);
+              when x"0015" => data <= eth_src_mac(11 downto  8);
+              when x"0016" => data <= eth_src_mac(15 downto 12);
+              when x"0017" => data <= eth_src_mac( 3 downto  0);
+              when x"0018" => data <= eth_src_mac( 7 downto  4);
               -- Ether Type 08:00
-              when x"019" => data <= eth_type(11 downto  8);
-              when x"01A" => data <= eth_type(15 downto 12); 
-              when x"01B" => data <= eth_type( 3 downto  0);
-              when x"01C" => data <= eth_type( 7 downto  4);
+              when x"0019" => data <= eth_type(11 downto  8);
+              when x"001A" => data <= eth_type(15 downto 12); 
+              when x"001B" => data <= eth_type( 3 downto  0);
+              when x"001C" => data <= eth_type( 7 downto  4);
               -------------------------
               -- User data packet
               ------------------------------
               -- IPv4 Header
               ----------------------------
-              when x"01D" => data <= ip_header_len;
-              when x"01E" => data <= ip_version;
+              when x"001D" => data <= ip_header_len;
+              when x"001E" => data <= ip_version;
               
-              when x"01F" => data <= ip_dscp_ecn( 3 downto  0);
-              when x"020" => data <= ip_dscp_ecn( 7 downto  4);
+              when x"001F" => data <= ip_dscp_ecn( 3 downto  0);
+              when x"0020" => data <= ip_dscp_ecn( 7 downto  4);
               -- Length of total packet (excludes etherent header and ethernet FCS) = 0x0030
-              when x"021" => data <= ip_length(11 downto  8);
-              when x"022" => data <= ip_length(15 downto 12);
-              when x"023" => data <= ip_length( 3 downto  0);
-              when x"024" => data <= ip_length( 7 downto  4);
+              when x"0021" => data <= ip_length(11 downto  8);
+              when x"0022" => data <= ip_length(15 downto 12);
+              when x"0023" => data <= ip_length( 3 downto  0);
+              when x"0024" => data <= ip_length( 7 downto  4);
               -- all zeros
-              when x"025" => data <= ip_identification(11 downto  8);
-              when x"026" => data <= ip_identification(15 downto 12);
-              when x"027" => data <= ip_identification( 3 downto  0);
-              when x"028" => data <= ip_identification( 7 downto  4);
+              when x"0025" => data <= ip_identification(11 downto  8);
+              when x"0026" => data <= ip_identification(15 downto 12);
+              when x"0027" => data <= ip_identification( 3 downto  0);
+              when x"0028" => data <= ip_identification( 7 downto  4);
               -- No flags, no frament offset.
-              when x"029" => data <= ip_flags_and_frag(11 downto  8);
-              when x"02A" => data <= ip_flags_and_frag(15 downto 12);
-              when x"02B" => data <= ip_flags_and_frag( 3 downto  0);
-              when x"02C" => data <= ip_flags_and_frag( 7 downto  4);
+              when x"0029" => data <= ip_flags_and_frag(11 downto  8);
+              when x"002A" => data <= ip_flags_and_frag(15 downto 12);
+              when x"002B" => data <= ip_flags_and_frag( 3 downto  0);
+              when x"002C" => data <= ip_flags_and_frag( 7 downto  4);
               -- Time to live
-              when x"02D" => data <= ip_ttl( 3 downto  0);
-              when x"02E" => data <= ip_ttl( 7 downto  4);
+              when x"002D" => data <= ip_ttl( 3 downto  0);
+              when x"002E" => data <= ip_ttl( 7 downto  4);
               -- Protocol (UDP)
-              when x"02F" => data <= ip_protocol( 3 downto  0);
-              when x"030" => data <= ip_protocol( 7 downto  4);
+              when x"002F" => data <= ip_protocol( 3 downto  0);
+              when x"0030" => data <= ip_protocol( 7 downto  4);
               -- Header checksum
-              when x"031" => data <= ip_checksum(11 downto  8);
-              when x"032" => data <= ip_checksum(15 downto 12);
-              when x"033" => data <= ip_checksum( 3 downto  0);
-              when x"034" => data <= ip_checksum( 7 downto  4);
+              when x"0031" => data <= ip_checksum(11 downto  8);
+              when x"0032" => data <= ip_checksum(15 downto 12);
+              when x"0033" => data <= ip_checksum( 3 downto  0);
+              when x"0034" => data <= ip_checksum( 7 downto  4);
               -- source address
-              when x"035" => data <= ip_src_addr(27 downto 24);
-              when x"036" => data <= ip_src_addr(31 downto 28);
-              when x"037" => data <= ip_src_addr(19 downto 16);
-              when x"038" => data <= ip_src_addr(23 downto 20);
-              when x"039" => data <= ip_src_addr(11 downto  8);
-              when x"03A" => data <= ip_src_addr(15 downto 12);
-              when x"03B" => data <= ip_src_addr( 3 downto  0);
-              when x"03C" => data <= ip_src_addr( 7 downto  4);
+              when x"0035" => data <= ip_src_addr(27 downto 24);
+              when x"0036" => data <= ip_src_addr(31 downto 28);
+              when x"0037" => data <= ip_src_addr(19 downto 16);
+              when x"0038" => data <= ip_src_addr(23 downto 20);
+              when x"0039" => data <= ip_src_addr(11 downto  8);
+              when x"003A" => data <= ip_src_addr(15 downto 12);
+              when x"003B" => data <= ip_src_addr( 3 downto  0);
+              when x"003C" => data <= ip_src_addr( 7 downto  4);
               -- dest address
-              when x"03D" => data <= ip_dst_addr(27 downto 24);
-              when x"03E" => data <= ip_dst_addr(31 downto 28);
-              when x"03F" => data <= ip_dst_addr(19 downto 16);
-              when x"040" => data <= ip_dst_addr(23 downto 20);
-              when x"041" => data <= ip_dst_addr(11 downto  8);
-              when x"042" => data <= ip_dst_addr(15 downto 12);
-              when x"043" => data <= ip_dst_addr( 3 downto  0);
-              when x"044" => data <= ip_dst_addr( 7 downto  4);
+              when x"003D" => data <= ip_dst_addr(27 downto 24);
+              when x"003E" => data <= ip_dst_addr(31 downto 28);
+              when x"003F" => data <= ip_dst_addr(19 downto 16);
+              when x"0040" => data <= ip_dst_addr(23 downto 20);
+              when x"0041" => data <= ip_dst_addr(11 downto  8);
+              when x"0042" => data <= ip_dst_addr(15 downto 12);
+              when x"0043" => data <= ip_dst_addr( 3 downto  0);
+              when x"0044" => data <= ip_dst_addr( 7 downto  4);
               -- No options in this packet
               
               ------------------------------------------------
               -- UDP/IP Header - from port 4096 to port 4096
               ------------------------------------------------
               -- Source port 4096
-              when x"045" => data <= udp_src_port(11 downto  8);
-              when x"046" => data <= udp_src_port(15 downto 12);
-              when x"047" => data <= udp_src_port( 3 downto  0);
-              when x"048" => data <= udp_src_port( 7 downto  4);
+              when x"0045" => data <= udp_src_port(11 downto  8);
+              when x"0046" => data <= udp_src_port(15 downto 12);
+              when x"0047" => data <= udp_src_port( 3 downto  0);
+              when x"0048" => data <= udp_src_port( 7 downto  4);
               -- Target port 4096
-              when x"049" => data <= udp_dst_port(11 downto  8);
-              when x"04A" => data <= udp_dst_port(15 downto 12);
-              when x"04B" => data <= udp_dst_port( 3 downto  0);
-              when x"04C" => data <= udp_dst_port( 7 downto  4);
+              when x"0049" => data <= udp_dst_port(11 downto  8);
+              when x"004A" => data <= udp_dst_port(15 downto 12);
+              when x"004B" => data <= udp_dst_port( 3 downto  0);
+              when x"004C" => data <= udp_dst_port( 7 downto  4);
               -- UDP Length (header + data) 24 octets
-              when x"04D" => data <= udp_length(11 downto  8);
-              when x"04E" => data <= udp_length(15 downto 12);
-              when x"04F" => data <= udp_length( 3 downto  0);
-              when x"050" => data <= udp_length( 7 downto  4);
+              when x"004D" => data <= udp_length(11 downto  8);
+              when x"004E" => data <= udp_length(15 downto 12);
+              when x"004F" => data <= udp_length( 3 downto  0);
+              when x"0050" => data <= udp_length( 7 downto  4);
               -- UDP Checksum not suppled
-              when x"051" => data <= udp_checksum(11 downto  8);
-              when x"052" => data <= udp_checksum(15 downto 12);
-              when x"053" => data <= udp_checksum( 3 downto  0);
-              when x"054" => data <= udp_checksum( 7 downto  4);
+              when x"0051" => data <= udp_checksum(11 downto  8);
+              when x"0052" => data <= udp_checksum(15 downto 12);
+              when x"0053" => data <= udp_checksum( 3 downto  0);
+              when x"0054" => data <= udp_checksum( 7 downto  4);
               --------------------------------------------
               -- Finally! the  user data (defaults 
               -- to "0000" due to assignement above CASE).
               ---------------------------------------------
-              when x"055" => user_data <= '1';
+              when x"0055" => user_data <= '1';
 
               --------------------------------------------
               -- Ethernet Frame Check Sequence (CRC) will 
               -- be added here, overwriting these nibbles
               --------------------------------------------
-              when x"855" => data_valid <= '0'; user_data <= '0';
-              when x"856" => NULL;
-              when x"857" => NULL;
-              when x"858" => NULL;
-              when x"859" => NULL;
-              when x"85A" => NULL;
-              when x"85B" => NULL;
-              when x"85C" => NULL;
+              when x"2055" => data_valid <= '0'; user_data <= '0';
+              when x"2056" => NULL;
+              when x"2057" => NULL;
+              when x"2058" => NULL;
+              when x"2059" => NULL;
+              when x"205A" => NULL;
+              when x"205B" => NULL;
+              when x"205C" => NULL;
               ----------------------------------------------------------------------------------
               -- End of frame - there needs to be at least 20 octets (40 counts) before  sending 
               -- the next packet, (maybe more depending  on medium?) 12 are for the inter packet
@@ -237,7 +237,7 @@ generate_nibbles: process (clk)
               -- Note that when the count of 0000 adds one  more nibble, so if start is assigned 
               -- '1' this should be minimum that is  within spec.
               ----------------------------------------------------------------------------------
-              when x"883" => counter <= (others => '0'); busy  <= '0';
+              when x"2083" => counter <= (others => '0'); busy  <= '0';
               when others => data <= "0000";
             end case;
          end if;    
